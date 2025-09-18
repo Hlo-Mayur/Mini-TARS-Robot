@@ -1,6 +1,12 @@
+
+
 import cv2
 import argparse
 from ultralytics import YOLO
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from robot_controller import RobotController
 
 def get_decision_from_zones(detected_zones):
     """Makes a navigation decision based on which zones are occupied."""
@@ -37,6 +43,8 @@ cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     print("Error: Could not open webcam.")
     exit()
+
+robot = RobotController()
 
 # --- Main Loop ---
 while True:
@@ -76,11 +84,18 @@ while True:
             else:
                 detected_zones.add("RIGHT")
     
-    # Get the final command from our function
-    command = get_decision_from_zones(detected_zones)
-    
-    # Print the command to the terminal
-    print(command)
+
+    # Robot control logic
+    if "CENTER" in detected_zones:
+        robot.stop()
+    elif "LEFT" in detected_zones and "RIGHT" in detected_zones:
+        robot.stop()
+    elif "LEFT" in detected_zones:
+        robot.turn_right()
+    elif "RIGHT" in detected_zones:
+        robot.turn_left()
+    else:
+        robot.move_forward()
 
     # Display the frame
     cv2.imshow("TARS Vision System", annotated_frame)
