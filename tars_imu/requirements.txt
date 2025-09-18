@@ -1,0 +1,6 @@
+numpy
+scipy
+ahrs
+matplotlib
+mpu9250-jmdev
+smbus2
